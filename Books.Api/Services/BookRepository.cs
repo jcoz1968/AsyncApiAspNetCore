@@ -17,8 +17,21 @@ namespace Books.Api.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        public IEnumerable<Book> GetBooks()
+        {
+            _context.Database.ExecuteSqlCommand("WAITFOR DELAY '00:00:02';");
+            return _context.Books.Include(b => b.Author).ToList();
+        }
+
+        public Book GetBook(Guid id)
+        {
+            return _context.Books.Include(b => b.Author)
+                .FirstOrDefault(b => b.Id == id);
+        }
+
         public async Task<Book> GetBookAsync(Guid id)
         {
+            await _context.Database.ExecuteSqlCommandAsync("WAITFOR DELAY '00:00:02';");
             return await _context.Books.Include(b => b.Author)
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
